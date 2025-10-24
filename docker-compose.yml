@@ -1,40 +1,13 @@
+version: "3.8"
+
 services:
-
-  php:
+  app:
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile.php
-    image: php
-    container_name: "php"
+      dockerfile: dockerfiles/Dockerfile.python
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app
     restart: always
-    ports:
-     - "9000:9000"
-    volumes:
-     - ./src:/var/www/html
-    networks:
-     - app-network
-  
-  nginx:
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.nginx
-    image: nginx
-    container_name: "nginx"
-    restart: "always"
-    ports:
-      - "8443:443"
-    volumes:
-      - ./src:/var/www/html
-    depends_on:
-      - php
-    networks:
-      - app-network
-    
-networks:
-  app-network:
-    driver: bridge
-volumes:
-  maria-db:
-
-
-    

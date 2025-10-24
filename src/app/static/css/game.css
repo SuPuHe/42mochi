@@ -1,0 +1,227 @@
+/* ------------------ Base ------------------ */
+body {
+	background: #ffffff;
+	font-family: "Press Start 2P", system-ui;
+  }
+
+  .container {
+	width: 70%;
+	text-align: center;
+	margin: 0 auto;
+  }
+
+  .title {
+	background: #2e2e2e;
+	padding: 15px;
+	color: #fff;
+	margin-bottom: 30px;
+	font-size: 24px;
+	box-shadow: 0px 5px black, 0px -5px black, 5px 0px black, -5px 0px black,
+				0px 10px #00000038, 5px 5px #00000038, -5px 5px #00000038,
+				inset 0px 5px #ffffff1f, inset 0px -5px #00000030;
+  }
+
+  /* ------------------ Buttons ------------------ */
+  button {
+	color: #fff;
+	background-color: var(--coalition-color, #045153);
+	padding: 15px 40px;
+	margin: 10px;
+	font-size: 14px;
+	font-family: "Press Start 2P", system-ui;
+	border: 0;
+	box-shadow: 0px 5px black, 0px -5px black, 5px 0px black, -5px 0px black,
+				0px 10px #00000038, 5px 5px #00000038, -5px 5px #00000038,
+				inset 0px 5px #ffffff36;
+	cursor: pointer;
+	transition: all 0.1s ease;
+  }
+
+  button:hover {
+	background-color: var(--coalition-color-light, #056163);
+  }
+
+  button:active {
+	transform: translateY(5px);
+	box-shadow: 0px 5px black, 0px -5px black, 5px 0px black, -5px 0px black,
+				inset 0px 5px #00000038;
+	background-color: var(--coalition-color-dark, #034143);
+  }
+
+  /* ------------------ Coalition Badge ------------------ */
+  .coalition-badge {
+	display: inline-block;
+	padding: 8px 16px;
+	margin: 10px 0;
+	font-size: 12px;
+	color: #fff;
+	border-radius: 4px;
+	box-shadow: 0px 3px black, 0px -3px black, 3px 0px black, -3px 0px black;
+	text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+	background-color: var(--coalition-color, #6abc3a);
+  }
+
+  /* ------------------ HP & Hunger Bars ------------------ */
+  .hp-container, .days-container, .lvl-container {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin: 1rem 0;
+  }
+
+  .hp-text {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: var(--bar-fill, var(--coalition-color, #00babd));
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+	min-width: 100px;
+  }
+
+  .healthbar, .expbar {
+	width: calc(38px * var(--pixel-size, 4));
+	margin: 0 auto;
+	display: block;
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+  }
+
+  .healthbar_fill {
+	fill: var(--bar-fill, var(--coalition-color, #00babd));
+	transition: width 0.1s ease-in, fill 0.2s linear;
+  }
+
+  .healthbar_fill-top {
+	fill: var(--bar-top, var(--coalition-color-light, #69ecee));
+  }
+
+  .expbar_fill {
+	fill: var(--exp-fill, #0396FF);
+	transition: width 0.1s ease-in, fill 0.2s linear;
+  }
+
+  .expbar_fill-top {
+	fill: var(--exp-top, #32CCFF);
+  }
+
+  /* ------------------ Days & Level ------------------ */
+  .days-text {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: var(--coalition-color-light, #FFD700);
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+	padding: 0.5rem 1rem;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+	border: 2px solid var(--coalition-color, #FFD700);
+  }
+
+  .lvl-text {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: var(--coalition-color, var(--exp-fill));
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+	min-width: 100px;
+  }
+
+  /* ------------------ Game Layout ------------------ */
+  .navbar {
+	display: flex;
+	justify-content: space-between;
+	padding: 1rem;
+	background: var(--button_color, #323c39);
+  }
+
+  .nav-buttons {
+	display: flex;
+	gap: 1rem;
+	width: 100%;
+	justify-content: space-between;
+  }
+
+  .game-container {
+	display: grid;
+	grid-template-columns: 200px 1fr 200px;
+	gap: 2rem;
+	padding: 2rem;
+	max-width: 1200px;
+	margin: 0 auto;
+	position: relative;
+  }
+
+  .left-side, .right-side {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+  }
+
+  .right-side {
+	align-items: flex-end;
+	padding-top: 250px;
+  }
+
+  .character-section canvas {
+	width: 256px;
+	height: 256px;
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+  }
+
+  /* ------------------ Coins ------------------ */
+  .coins {
+	display: flex;
+	align-items: center;
+	color: var(--coalition-color, #00babd);
+	font-weight: bold;
+  }
+
+  /* ------------------ Modal ------------------ */
+  .modal {
+	position: absolute;
+	bottom: 2rem;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 600px;
+	max-height: 400px;
+	background-color: #f0f0f0;
+	border: 5px solid #222034;
+	padding: 20px;
+	z-index: 1000;
+	box-shadow: 0 0 0 100vmax rgba(0,0,0,0.5);
+  }
+
+  .modal.hidden { display: none; }
+
+  .modal-content {
+	background-color: #fff;
+	padding: 15px;
+	border: 3px solid var(--coalition-color, #045153);
+	max-height: 350px;
+	overflow-y: auto;
+	position: relative;
+  }
+
+  .modal-close {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	background: rgba(255, 255, 255, 0.9);
+	border: 2px solid #323c39;
+	border-radius: 4px;
+	font-size: 28px;
+	font-weight: bold;
+	color: #323c39;
+	cursor: pointer;
+	width: 36px;
+	height: 36px;
+	line-height: 32px;
+	text-align: center;
+	box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+	transition: all 0.2s ease;
+	z-index: 10;
+  }
+
+  .modal-close:hover {
+	color: #fff;
+	background-color: var(--coalition-color, #045153);
+	border-color: var(--coalition-color, #045153);
+  }

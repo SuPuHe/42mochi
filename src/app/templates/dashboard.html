@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Buddy Dashboard - {{ displayname | default('Guest') }}</title>
+
+    <!-- Основные стили -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+    <!-- CSS-переменные коалиции -->
+    <style>
+        :root {
+            --coalition-color: {{ coalition_color | default('#ccc') }};
+            --coalition-color-light: {{ coalition_color_light | default('#ddd') }};
+            --coalition-color-dark: {{ coalition_color_dark | default('#999') }};
+        }
+
+        .coalition {
+            background-color: var(--coalition-color);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .statbar { height: 15px; border-radius: 5px; background: #ddd; overflow: hidden; }
+        .bar { height: 15px; border-radius: 5px; }
+        .bar.hp { background: #e91e63; }
+        .bar.hunger { background: #4caf50; }
+        .positive { color: green; }
+        .negative { color: red; }
+        .panel { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 10px; background: #f9f9f9; }
+        .panel h2 { margin-top: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- Профиль -->
+    <div class="profile">
+        <h1>Hello, {{ displayname | default('Guest') }} ({{ login | default('') }})</h1>
+        <p><strong>Campus:</strong> {{ campus | default('Unknown') }}</p>
+        <p><strong>Coalition:</strong> <span class="coalition">{{ coalition | default('None') }}</span></p>
+        <p><strong>XP Level:</strong> {{ level | default(0) }}</p>
+        <p><strong>First login:</strong> {{ first_login_date | default('N/A') }}</p>
+        <form method="POST" style="margin-top:10px;">
+            <button name="refresh_data" class="refresh">Refresh 42 Data</button>
+        </form>
+    </div>
+
+    <!-- Сводка игрока -->
+    <div class="panel">
+        <h2>Player Summary</h2>
+        <table border="1" cellpadding="8">
+            <tr style="background:#eee;">
+                <th>First</th><th>Last</th><th>Intra</th><th>Curriculum Lv</th>
+                <th>Monster Lv</th><th>HP</th><th>Hunger</th><th>Food</th><th>Coins</th>
+            </tr>
+            <tr>
+                <td>{{ first_name | default('') }}</td>
+                <td>{{ last_name | default('') }}</td>
+                <td>{{ login | default('') }}</td>
+                <td>{{ level | default(0) }}</td>
+                <td>{{ monster_level | default(1) }}</td>
+                <td>{{ monster_hp | default(0) }}/100
+                    <div class="statbar">
+                        <div class="bar hp" style="width: {{ monster_hp | default(0) }}%;"></div>
+                    </div>
+                </td>
+                <td>{{ hunger | default(0) }}/100
+                    <div class="statbar">
+                        <div class="bar hunger" style="width: {{ hunger | default(0) }}%;"></div>
+                    </div>
+                </td>
+                <td>{{ food | default(0) }}</td>
+                <td>{{ total_coins | default(0) }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Панель управления монстром -->
+    <div class="panel">
+        <h2>Monster Control Panel</h2>
+        <form method="POST">
+            <button name="tick">Tick (-5 Hunger, -5 HP if starving)</button>
+            <button name="simulate_day">🌞 Simulate Day (-20 Hunger, -10 HP if &lt;30)</button><br>
+            <button name="feed" {% if food <= 0 %}disabled{% endif %}>Feed</button>
+            <button name="snack">Snack</button>
+            <button name="work">Work (+50 Coins)</button>
+            <button name="buy_food" {% if total_coins < 30 %}disabled{% endif %}>Buy Food</button>
+            <button name="level_up" {% if monster_hp < 100 or hunger < 50 %}disabled{% endif %}>Level Up</button>
+        </form>
+    </div>
+
+    <!-- Заработок монет -->
+    <div class="panel">
+        <h2>Coin Earning Actions</h2>
+        <form method="POST">
+            <button name="earn_project">Complete Project (+50)</button>
+            <button name="earn_evaluation">Do Evaluation (+20)</button>
+            <button name="earn_streak">Daily Streak (+50)</button>
+            <button name="earn_milestone">Milestone (+200)</button>
+        </form>
+    </div>
+
+    <!-- Лог транзакций -->
+    <div class="panel">
+        <h2>Coin Transaction Log (last {{ coin_log|length }})</h2>
+        <table border="1" cellpadding="6">
+            <tr><th>Time</th><th>Action</th><th>Δ Coins</th></tr>
+            {% for entry in coin_log %}
+                <tr>
+                    <td>{{ entry.time }}</td>
+                    <td>{{ entry.desc }}</td>
+                    <td class="{{ 'positive' if entry.delta >= 0 else 'negative' }}">
+                        {{ '+' if entry.delta >= 0 else '' }}{{ entry.delta }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- JS переменные -->
+    <script>
+        const sessionData = {{ session | tojson | safe }};
+        console.log(sessionData);
+    </script>
+
+    <!-- JS скрипты -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+</body>
+</html>
