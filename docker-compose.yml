@@ -1,13 +1,68 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  app:
+
+  # FastAPI Web Service
+  web:
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile.python
-    container_name: fastapi_app
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./src:/app
+      # Путь к новому Dockerfile
+      dockerfile: dockerfiles/Dockerfile.web
+    image: fastapi-web
+    container_name: "fastapi-web"
     restart: always
+    # Используем порт 8000
+    ports:
+     - "8000:8000"
+    # Монтируем код для удобной разработки и доступа к статике
+    volumes:
+     - ./src:/app/src
+     - ./public:/app/public
+     - ./requirements.txt:/app/requirements.txt
+    # Загружаем переменные окружения для секретов
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    networks:
+     - app-network
+
+  # Nginx Service (SSL Termination & Reverse Proxy)
+  nginx:
+    # Используем готовый официальный образ
+    image: nginx:latest
+    container_name: "nginx"
+    restart: "always"
+    # Публичный порт 8443
+    ports:
+      - "8443:443"
+    volumes:
+      # Монтируем вашу конфигурацию NGINX
+      - ./nginx/default.config:/etc/nginx/conf.d/default.conf:ro
+      # Добавьте сюда монтирование для ваших сертификатов, если Dockerfile.nginx не копировал их:
+      - ./nginx/certs/selfsigned.crt:/etc/nginx/certs/selfsigned.crt:ro
+      - ./nginx/certs/selfsigned.key:/etc/nginx/certs/selfsigned.key:ro
+    depends_on:
+      - web # Зависит от FastAPI
+    networks:
+      - app-network
+
+# НОВЫЙ СЕРВИС: Redis для сессий
+  redis:
+    image: redis:7-alpine
+    container_name: "redis_session"
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    volumes:
+      - redis_data:/data # Для сохранения данных Redis
+
+networks:
+  app-network:
+    driver: bridge
+volumes:
+  maria-db:
+  redis_data:
+

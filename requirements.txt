@@ -3,3 +3,8 @@ uvicorn[standard]
 jinja2
 sqlalchemy
 python-multipart
+httpx
+itsdangerous
+pydantic-settings
+redis
+starlette

@@ -1,0 +1,192 @@
+/* ============================= */
+/* Coalition-Aware Page Styles   */
+/* ============================= */
+
+/* Base container */
+.content-box {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: #fff;
+  border: 3px solid var(--coalition-color-dark, #000);
+  box-shadow: 6px 6px 0 var(--coalition-color-dark, #222);
+  border-radius: 8px;
+  font-family: "Press Start 2P", system-ui;
+}
+
+/* Headings */
+h1, h2 {
+  color: var(--coalition-color, #045153);
+  text-align: center;
+  text-shadow: 2px 2px 0 var(--coalition-color-dark, #03393a);
+}
+
+/* Sections */
+section {
+  margin-top: 2rem;
+  border-top: 2px dashed var(--coalition-color-light, #056163);
+  padding-top: 1rem;
+}
+
+/* Cards / Posts */
+.card {
+  border: 2px solid var(--coalition-color-dark, #000);
+  border-radius: 6px;
+  background: #e0e0e0;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 5px var(--coalition-color-dark, #000);
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s, border-color 0.1s;
+  cursor: pointer;
+}
+
+.card:hover {
+  background: var(--coalition-color-light, #d5f0f0);
+  border-color: var(--coalition-color, #045153);
+}
+
+.card:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px var(--coalition-color-dark, #000);
+  background: var(--coalition-color, #cceaea);
+}
+
+/* Card content */
+.card-title {
+  font-size: 14px;
+  color: var(--coalition-color, #045153);
+  margin-bottom: 6px;
+}
+
+.card-meta {
+  font-size: 11px;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.card-summary {
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+/* Buttons */
+.btn {
+  font-family: "Press Start 2P", system-ui;
+  font-size: 10px;
+  border: 2px solid var(--coalition-color-dark, #000);
+  border-radius: 6px;
+  box-shadow: 0 4px var(--coalition-color-dark, #000);
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s, border-color 0.1s;
+}
+
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px var(--coalition-color-dark, #000);
+}
+
+/* Coalition-themed buttons */
+.btn-primary {
+  background: var(--coalition-color, #045153);
+  color: #fff;
+  border-color: var(--coalition-color-dark, #000);
+}
+
+.btn-primary:hover {
+  background: var(--coalition-color-light, #056163);
+  box-shadow: 0 5px var(--coalition-color-dark, #034143);
+}
+
+.btn-primary:active {
+  background: var(--coalition-color-dark, #034143);
+  transform: translateY(3px);
+}
+
+.btn-secondary {
+  background: #999;
+  color: #fff;
+  border-color: #555;
+}
+
+/* Modal Base (shared for all modals) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-base {
+  background: #fff;
+  border: 3px solid var(--coalition-color-dark, #000);
+  box-shadow: 6px 6px 0 var(--coalition-color-dark, #000);
+  border-radius: 8px;
+  padding: 1.5rem;
+  font-family: "Press Start 2P", system-ui;
+  font-size: 10px;
+  width: 90%;
+  max-width: 480px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Create Post Modal */
+.new-post-modal {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 340px;
+}
+
+.new-post-modal h3 {
+  text-align: center;
+  color: var(--coalition-color, #045153);
+  font-size: 14px;
+  margin-bottom: 1rem;
+}
+
+.new-post-modal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.new-post-modal label {
+  margin-bottom: 4px;
+  color: var(--coalition-color-dark, #000);
+}
+
+.new-post-modal input,
+.new-post-modal textarea {
+  width: 100%;
+  border: 2px solid var(--coalition-color-dark, #000);
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 12px;
+  font-family: "Press Start 2P", system-ui;
+  font-size: 10px;
+  background: #f9f9f9;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.new-post-modal input:focus,
+.new-post-modal textarea:focus {
+  outline: none;
+  background: var(--coalition-color-light, #e0ffff);
+  border-color: var(--coalition-color, #045153);
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

@@ -1,0 +1,53 @@
+.auth-page * {
+    box-sizing: border-box;
+}
+.auth-page {
+    height: 100vh;
+}
+.auth-page .navbar {
+    height: 50px;
+}
+.register, .login {
+    height: 80%;
+    padding: 0 25px;
+}
+.auth-form {
+    /* display: flex;
+    justify-content: space-around;
+    
+    align-items: flex-start; */
+    width: 25%;
+    height: 100%;
+    margin: auto;
+    color: #E0E0E0;
+}
+.auth-page label {
+    color: #E0E0E0;
+}
+/* Form fields */
+.auth-page input[type="text"],
+.auth-page input[type="email"],
+.auth-page input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #5B6A7A;
+}
+
+/* Submit buttons */
+.auth-page button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4A90E2;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.auth-page button:hover {
+    background-color: #ffffff;
+}

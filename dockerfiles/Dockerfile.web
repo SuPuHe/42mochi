@@ -1,0 +1,20 @@
+FROM python:3.11-slim
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Копируем и устанавливаем зависимости
+# Создайте requirements.txt в корне проекта!
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копируем исходный код, статические файлы и шаблоны
+# Мы копируем src/ целиком, так как он содержит App/Utility, App/Views и routers/
+COPY src /app/src
+
+# Порт Uvicorn (FastAPI)
+EXPOSE 8000
+
+# Запускаем Uvicorn (сервер FastAPI)
+# Предполагаем, что главный файл приложения - src/main.py
+CMD ["uvicorn", "main:app", "--app-dir", "/app/src", "--host", "0.0.0.0", "--port", "8000"]
