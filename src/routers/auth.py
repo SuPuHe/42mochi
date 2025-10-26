@@ -14,7 +14,14 @@ router = APIRouter()
 @router.get("/login")
 async def login(request: Request, response: Response):
     state = secrets.token_hex(8)
-    response.set_cookie(key="oauth_state", value=state, httponly=True, secure=True)
+    response.set_cookie(
+    key="oauth_state",
+    value=state,
+    httponly=True,
+    secure=True,       # важно для https
+    samesite="none",    # позволяет callback с другого домена
+    path="/"            # корень сайта
+)
 
     params = {
         'client_id': oauth_settings.client_id,
@@ -24,7 +31,8 @@ async def login(request: Request, response: Response):
         'state': state
     }
 
-    url = f"{oauth_settings.authorize_url}?{httpx.QueryParams(params).url_encoded}"
+    query_string = str(httpx.QueryParams(params))
+    url = f"{oauth_settings.authorize_url}?{query_string}"
     return RedirectResponse(url=url, status_code=302)
 
 # --- GET /Auth/callback ---
@@ -34,23 +42,14 @@ async def callback(request: Request, response: Response):
     state_from_url = request.query_params.get('state')
     state_from_cookie = request.cookies.get('oauth_state')
 
+    print("callback code:", code)
+    print("state_from_url:", state_from_url)
+    print("state_from_cookie:", state_from_cookie)
+
     response.delete_cookie(key="oauth_state")
 
     if not code or state_from_url != state_from_cookie:
         raise HTTPException(status_code=400, detail="Invalid or missing code/state.")
-
-    # Заглушка: получение токена и user_info
-    access_token = "dummy_access_token"
-    user_info = {"id": 123, "login": "demo_user"}
-
-    session_data = {
-        'user_password': 'verified',
-        'access_token': access_token,
-        'user_info': user_info,
-        'first_login_date': datetime.now(timezone.utc).isoformat()
-    }
-    await set_session_data(response, session_data)
-    return RedirectResponse(url="/dashboard", status_code=302)
 
 # --- GET /Auth/logout ---
 @router.get("/logout")
