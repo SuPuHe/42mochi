@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends, Response
+from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from typing import Dict, Any
 
@@ -11,11 +11,11 @@ router = APIRouter(prefix="/api")
 @router.get("/getMochiStats")
 async def get_mochi_stats(
     request: Request,
-    response: Response,
     session: Dict[str, Any] = Depends(require_auth)
 ):
-    """Возвращает текущее состояние игры Моти в формате JSON."""
-    game_service = GameService(session=session, response=response)
-    game_state = game_service.get_current_state()
+    if session is None:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
+    game_service = GameService(session=session, response=None, request=request)
+    game_state = game_service.get_current_state()
     return JSONResponse(content=game_state)

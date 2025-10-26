@@ -1,15 +1,18 @@
 # src/App/Services/GameService.py
 from typing import Dict, Any
 from datetime import datetime
-from fastapi import Response
+from fastapi import Response, Request
 
 # Импорт set_session_data для обновления сессии после изменения состояния
 from App.Utility.session_manager import set_session_data
 
 class GameService:
-    def __init__(self, session: Dict[str, Any], response: Response):
+    def __init__(self, session: Dict[str, Any], response: Response, request: Request):
+        if not isinstance(session, dict):
+            raise ValueError("Session must be a dict.")
         self.session = session
         self.response = response
+        self.request = request
 
     def _log_action(self, desc: str, delta: int = 0):
         """Логирует действие в сессию, сохраняя последние 20 записей."""
@@ -103,7 +106,7 @@ class GameService:
             self._log_action("Milestone reward", 200)
 
         # После изменения состояния записываем его обратно в Redis
-        await set_session_data(self.response, self.session)
+        await set_session_data(self.response, self.request, self.session)
 
 
     def get_current_state(self) -> Dict[str, Any]:

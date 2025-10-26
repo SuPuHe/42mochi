@@ -1,61 +1,54 @@
-# src/routers/dashboard.py
-from fastapi import APIRouter, Request, Response, Depends, Form
+from fastapi import APIRouter, Request, Response, Depends, Form, HTTPException
 from fastapi.responses import RedirectResponse
 from starlette.templating import Jinja2Templates
 from typing import Dict, Any
 
-# Импорт наших сервисов и зависимостей
 from App.Utility.session_manager import get_session_data, set_session_data
 from App.Services.FortyTwoApiService import FortyTwoApiService
 from App.Services.GameService import GameService
 
-# Инициализация Jinja2 (должна быть в main.py, но для примера тут)
 templates = Jinja2Templates(directory="src/Views")
-
 router = APIRouter()
 
-# Зависимость для проверки аутентификации (аналог "Ensure authentication" в PHP)
-async def require_auth(session: Dict[str, Any] = Depends(get_session_data)):
-    """Проверяет access_token в сессии. Если нет, редиректит на логин."""
-    if not session or not session.get('access_token'):
-        # Редирект на главную страницу (где должен быть роут на логин)
-        return RedirectResponse(url="/", status_code=302)
+# --- Зависимость для аутентификации ---
+async def require_auth(request: Request) -> dict:
+    """
+    Проверяет аутентификацию пользователя.
+    Возвращает словарь сессии, если пользователь авторизован.
+    """
+    session = await get_session_data(request)  # <- только request
+
+    if not session or 'user_id' not in session:
+        if str(request.url.path).startswith("/api"):
+            raise HTTPException(status_code=401, detail="Unauthorized")
+        return None  # Для веб-страниц будем редиректить в роутах
+
     return session
 
-# --- Роут: /dashboard (GET) ---
+# --- GET /dashboard ---
 @router.get("/dashboard")
 async def dashboard_view(
     request: Request,
     response: Response,
-    auth_result = Depends(require_auth)
+    session: dict = Depends(require_auth)
 ):
-    """Отображает главную панель: загружает данные 42 API, инициализирует игру и рендерит шаблон."""
+    if session is None:
+        return RedirectResponse(url="/Auth/login", status_code=302)
 
-    # Если require_auth вернул RedirectResponse, возвращаем его
-    if isinstance(auth_result, RedirectResponse):
-        return auth_result
-
-    session = auth_result
     api_service = FortyTwoApiService(session=session)
-    game_service = GameService(session=session, response=response)
+    game_service = GameService(session=session, response=response, request=request)
 
-    # 1. Получение данных 42 API (с кэшированием в сессии)
     user_data = await api_service.get_user_data()
-
     if not user_data:
-        # Если не удалось получить данные (например, просрочен токен)
         return RedirectResponse(url="/Auth/logout", status_code=302)
 
     user_details = api_service.parse_user_details(user_data)
     coalition_data = await api_service.get_coalition_data(user_data.get('id'))
-
-    # 2. Инициализация и получение состояния игры
     game_state = game_service.get_current_state()
 
-    # 3. Сохранение обновленной сессии (с кэшированными user_info и coalition_info)
+    # Сохраняем сессию
     await set_session_data(response, session)
 
-    # 4. Рендеринг шаблона
     context = {
         "request": request,
         "first_login_date": session.get('first_login_date'),
@@ -63,43 +56,26 @@ async def dashboard_view(
         "coalition": coalition_data,
         "state": game_state,
     }
-    # Предполагаем, что у вас есть шаблон views/dashboard.html
     return templates.TemplateResponse("dashboard.html", context)
 
-
-# --- Роут: /dashboard (POST) ---
+# --- POST /dashboard ---
 @router.post("/dashboard")
 async def dashboard_post(
+    request: Request,
     response: Response,
-    auth_result = Depends(require_auth),
-    # Ожидаем, что клиент отправит action через поле формы
-    # Например: <button type="submit" name="action" value="simulate_day">
-    action: str = Form(..., description="Action to perform (e.g., 'simulate_day', 'feed', 'work')")
+    action: str = Form(...),
+    session: dict = Depends(require_auth)
 ):
-    """Обрабатывает игровые действия POST и редиректит обратно на GET-роут."""
+    if session is None:
+        return RedirectResponse(url="/Auth/login", status_code=302)
 
-    # Если require_auth вернул RedirectResponse, возвращаем его
-    if isinstance(auth_result, RedirectResponse):
-        return auth_result
+    game_service = GameService(session=session, response=response, request=request)
 
-    session = auth_result
-    game_service = GameService(session=session, response=response)
-
-    # 1. Refresh 42 Data (отдельная логика из PHP-файла)
     if action == 'refresh_data':
-        if 'user_info' in session:
-            del session['user_info']
-        if 'coalition_info' in session:
-            del session['coalition_info']
-
-        # Сохраняем сессию после очистки
+        session.pop('user_info', None)
+        session.pop('coalition_info', None)
         await set_session_data(response, session)
-
-        # Редирект для повторного запуска GET-роута
         return RedirectResponse(url="/dashboard", status_code=302)
 
-    # 2. Обработка всех остальных игровых действий
     await game_service.handle_action(action)
-
-    # Принудительный редирект POST->GET для предотвращения повторной отправки формы
     return RedirectResponse(url="/dashboard", status_code=302)
